@@ -5,8 +5,11 @@
 --
 
 vim.g.auto_save = 1
-vim.opt.iskeyword:append "-" -- hyphenated words recognized by searches
-lvim.colorscheme = "tokyonight"
+vim.opt.iskeyword:append "-"  -- hyphenated words recognized by searches
+
+vim.opt.relativenumber = true -- relative line numbers
+
+lvim.colorscheme = "darkblue"
 
 -- Normal --
 -- Resize with arrows
@@ -32,7 +35,7 @@ lvim.keys.normal_mode["<leader>sx"] = ":close<CR>"    -- close current split win
 
 lvim.keys.normal_mode["<leader>to"] = ":tabnew<CR>"   -- open new tab
 lvim.keys.normal_mode["<leader>tx"] = ":tabclose<CR>" -- close current tab
-lvim.keys.normal_mode["<leader>tn"] = ":tabn<CR>"     --  go to next tab
+lvim.keys.normal_mode["<leader>tn"] = ":tabn<CR>"     --  go to next ta
 lvim.keys.normal_mode["<leader>tp"] = ":tabp<CR>"     --  go to previous tab
 
 lvim.builtin.which_key.mappings["t"] = {
@@ -70,17 +73,57 @@ lvim.plugins = {
   { "tpope/vim-fugitive" },
   { "mhinz/vim-signify" },
   { "folke/tokyonight.nvim" },
-  { "tyru/open-browser.vim" }
+  { "tyru/open-browser.vim" },
+  { "aklt/plantuml-syntax" },
+  { "weirongxu/plantuml-previewer.vim" },
+  {
+    "ggandor/leap.nvim",
+    name = "leap",
+    config = function()
+      require("leap").add_default_mappings()
+    end,
+  },
+  {
+    'wfxr/minimap.vim',
+    build = "cargo install --locked code-minimap",
+    cmd = { "Minimap", "MinimapClose", "MinimapToggle", "MinimapRefresh", "MinimapUpdateHighlight" },
+    config = function()
+      vim.cmd("let g:minimap_width = 10")
+      vim.cmd("let g:minimap_auto_start = 1")
+      vim.cmd("let g:minimap_auto_start_win_enter = 1")
+    end,
+  },
+  {
+    "nacro90/numb.nvim",
+    event = "BufRead",
+    config = function()
+      require("numb").setup {
+        show_numbers = true,    -- Enable 'number' for the window while peeking
+        show_cursorline = true, -- Enable 'cursorline' for the window while peeking
+      }
+    end,
+  },
+  {
+    "windwp/nvim-spectre",
+    event = "BufRead",
+    config = function()
+      require("spectre").setup()
+    end,
+  },
 }
 
 local formatters = require "lvim.lsp.null-ls.formatters"
 formatters.setup {
   { name = "black" },
   { name = "autoflake" },
-  { name = "prettier" }
+  { name = "prettier" },
+  { command = "google_java_format", filetypes = { "java" } },
 }
 
 local linters = require "lvim.lsp.null-ls.linters"
 linters.setup {
   { name = "flake8" },
+  { name = "mypy" },
 }
+
+vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "jdtls" })
